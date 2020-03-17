@@ -113,11 +113,6 @@ void j_SetIR(uint32_t ir, uint8_t len) {
   j_RunIdle_ShiftIR();
   j_SendData((uint8_t*) &ir, len);
 }
-// From RunIdle => ShiftDR => put data to DR => return to RunIdle
-void j_SetDR(uint8_t* p, int len) {
-  j_RunIdle_ShiftDR();
-  j_SendData(p, len);
-}
 // From RunIdle => ShiftDR => get data from DR => return to RunIdle
 void j_GetDR(uint8_t* p, int len) {
   j_RunIdle_ShiftDR();
@@ -178,15 +173,7 @@ void loop() {
   digitalWrite(LED, digitalRead(PROBE_PIN));   // turn the LED on|off
   if (Serial.available() > 0) {
     inByte = Serial.read();
-    if (inByte == '1') {
-      regState = '1';
-      Serial.println("Start Slow j_Clock...");
-    }
-    else if (inByte == '2') {
-      regState = '2';
-      Serial.println("Start Fast j_Clock...");
-    }
-    else if (inByte == 'w') {
+    if (inByte == 'w') {
       regState = 'w';
       Serial.println("Write some data to EEPROM.");
       j_Eeprom.SAMPLE = SAMPLE;
@@ -282,13 +269,5 @@ void loop() {
       }
     }
     if (j != 0) Serial.println("");
-  }
-  else if (regState == '1') {
-    int i;
-    for(i = 0; i < MAX4xR; i++) j_Clock_slow(((i >> 1) & 0x01), (i & 0x01));
-  }
-  else if (regState == '2') {
-    int i;
-    for(i = 0; i < MAX4xR; i++) j_Clock_fast(((i >> 1) & 0x01), (i & 0x01));
   }
 }
